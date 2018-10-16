@@ -26,7 +26,10 @@ typedef struct tagCHAR {
 	unsigned long yCursor;
 	unsigned long fSizeX;
 	unsigned long fSizeY;
+	unsigned long xSize;
+	unsigned long ySize;
 	uint32_t *fBuffer;
+	
 
 }__attribute__ ((packed)) CHAR; 
 
@@ -39,6 +42,8 @@ CHAR gCHAR = { 	.xStart 	=0,
 		.yCursor 	= 0,
 		.fSizeX 	= FONT_SIZE_X, 
 		.fSizeY 	= FONT_SIZE_X,
+		.xSize		= 1,
+		.ySize		= 0,
 		.fBuffer 	= (uint32_t*) FONT_ROM_BIOS, //Font 8x8, ROM BIOS
 };
 
@@ -62,13 +67,15 @@ int CHARBuilt( 	unsigned long c,
 		gCHAR.yCursor 	= 0;
 		gCHAR.fSizeX 	= FONT_SIZE_X;
 		gCHAR.fSizeY 	= FONT_SIZE_Y;
+		gCHAR.xSize	= 1;
+		gCHAR.ySize	= 0;
 		gCHAR.fBuffer  	= (uint32_t*) FONT_ROM_BIOS; //Font 8x8, ROM BIOS
 	
 		charDefault = 1;
 	}
 
 
-	if(gCHAR.yCursor >= gCHAR.yEnd ) {
+	if(gCHAR.yCursor >= gCHAR.ySize ) {
 
 		//scroll();
 
@@ -77,7 +84,7 @@ int CHARBuilt( 	unsigned long c,
 
 
 	}
-    	if(gCHAR.xCursor >= gCHAR.xEnd) {
+    	if(gCHAR.xCursor >= gCHAR.xSize) {
 
         	gCHAR.yCursor += gCHAR.fSizeY;
         	gCHAR.xCursor  =0;      
@@ -93,7 +100,7 @@ int CHARBuilt( 	unsigned long c,
 
     	}else if(c >= ' '){ 
 
-        	DRAWChar(gCHAR.xCursor,gCHAR.yCursor,c,fgcolor,bgcolor,buffer,gCHAR.fBuffer);
+        	DRAWChar(gCHAR.xStart + gCHAR.xCursor,gCHAR.yStart + gCHAR.yCursor,c,fgcolor,bgcolor,buffer,gCHAR.fBuffer);
         	gCHAR.xCursor += gCHAR.fSizeX; 
          
     	}
@@ -119,17 +126,24 @@ int CHARBuiltSectCursor(	unsigned long x,
 }
 
 
-int CHARBuiltSectLen(	unsigned long xStart,
-			unsigned long yStart,
-			unsigned long xEnd,
-			unsigned long yEnd) 
+int CHARBuiltSectLen(	unsigned long x,
+			unsigned long y) 
 {
 	charDefault 	= 1;
 
-	gCHAR.xStart 	= xStart;
-	gCHAR.yStart 	= yStart;
-	gCHAR.xEnd 	= xEnd;
-	gCHAR.yEnd 	= yEnd;
+	gCHAR.xSize 	= x;
+	gCHAR.ySize 	= y;
+
+	return 0;
+}
+
+int CHARBuiltSectPosition(	unsigned long x,
+				unsigned long y) 
+{
+	charDefault 	= 1;
+
+	gCHAR.xStart 	= x;
+	gCHAR.yStart 	= y;
 
 	return 0;
 }
